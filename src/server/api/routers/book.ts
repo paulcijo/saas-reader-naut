@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import { auth } from "@clerk/nextjs";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const bookRouter = createTRPCRouter({
@@ -14,20 +14,22 @@ export const bookRouter = createTRPCRouter({
     create: publicProcedure
         .input(z.object({ name: z.string().min(1), url: z.string().min(1), userId: z.string().min(1) }))
         .mutation(async ({ ctx, input }) => {
-            // simulate a slow db call
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
+            const { userId } = auth();
             return ctx.db.book.create({
                 data: {
                     name: input.name,
                     url: input.url,
-                    userId: input.userId
+                    userId: userId
                 },
             });
         }),
 
-    getAll: publicProcedure.query(({ ctx }) => {
+    getAll: publicProcedure.query(({ ctx, input }) => {
+        const { userId } = auth();
         return ctx.db.book.findMany({
+            where: {
+                userId: userId,
+            },
             orderBy: { createdAt: "desc" },
         });
     }),

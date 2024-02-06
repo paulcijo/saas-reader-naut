@@ -1,20 +1,18 @@
 import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
-import { Prisma } from "node_modules/.prisma/client/index";
-
-import { CreatePost } from "~/app/_components/create-post";
+import { UserButton } from "@clerk/nextjs";
 import { api } from "~/trpc/server";
 import { CreateBook } from "./_components/create-book";
 
+
 export default async function Home() {
   noStore();
-  const hello = await api.post.hello.query({ text: "from tRPC" });
   const books = await api.book.getAll.query();
-  console.log(books);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
       <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
+        <UserButton afterSignOutUrl="/" />
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           <span className="text-[hsl(280,100%,70%)]">Reader</span>-naut
         </h1>
@@ -45,19 +43,3 @@ export default async function Home() {
   );
 }
 
-// async function CrudShowcase() {
-//   const latestPost = await api.post.getLatest.query();
-//   const { books } = await api.book.getAll.query();
-//   return (
-//     <div className="w-full max-w-xs">
-//       {books ? (
-//         <p className="truncate">Your most recent post: {latestPost.name}</p>
-//       ) : (
-//         <p>You have no books yet.</p>
-
-//       )}
-
-//       <CreatePost />
-//     </div>
-//   );
-// }
